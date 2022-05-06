@@ -416,6 +416,25 @@ typedef struct _GtkComboBoxPrivate GtkComboBoxTextPrivate;
 #endif
 
 
+// hack for kindle
+#define g_key_file_save_to_file(kfile,filename,error) { \
+   char * xdatax = g_key_file_to_data (kfile, NULL, error); \
+   g_file_set_contents (filename, xdatax, -1, error); \
+   g_free (xdatax); \
+}
+#define gdk_window_create_similar_surface(gdksurf,content,width,height) ({ \
+   cairo_t * wcr = gdk_cairo_create (gdksurf); \
+   cairo_surface_t * window_surface = cairo_get_target (wcr); \
+   cairo_surface_t * out_s = cairo_surface_create_similar (window_surface, content, width, height); \
+   cairo_destroy (wcr); \
+   out_s; \
+})
+#define gtk_combo_box_text_new_with_entry()	gtk_combo_box_entry_new_text()
+#define gtk_combo_box_text_append_text(combo,text)     gtk_combo_box_append_text(combo,text)
+#define GTK_COMBO_BOX_TEXT(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), GTK_TYPE_COMBO_BOX, GtkComboBoxText))
+
+
+
 #endif /* ------- GTK2 ------- */
 
 // ===================================================

@@ -35,6 +35,8 @@ extern GtkWidget * main_window;
 
 #define START_LEVEL_VALUE 6 // Iavor
 
+#define DEFAULT_USER_NAME "kindle"
+
 // global variables
 GtkWidget *game_area;
 GtkWidget *next_block_area;
@@ -97,7 +99,7 @@ void game_over_init();
 void game_set_pause();
 
 // draw.c
-void load_tetris_blocks (const char ** source_blocks_pix);
+void load_tetris_blocks ();
 void free_tetris_blocks (void);
 void set_block(int x,int y,int color,int next);
 void set_background_color (cairo_t * cr, GdkRectangle * area);

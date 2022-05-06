@@ -17,10 +17,10 @@ static GtkWidget * block_size_combo;
 static GtkWidget * radio_style1;
 static GtkWidget * radio_style2;
 static const int block_sizes[] = {
-   16, 24, 32, 48, 64, 96, 128, 0
+   16, 24, 32, 0
 };
 static const char * block_sizes_str[] = {
-   "16", "24", "32", "48", "64", "96", "128", NULL
+   "16", "24", "32", NULL
 };
 
 
@@ -30,8 +30,8 @@ void options_defaults (void)
    options.noise_level = 0;
    options.noise_height = 0;
    options.show_next_block = 1;
-   options.show_grid = 0;
-   options.block_size = 24;
+   options.show_grid = 1;
+   options.block_size = 32;
    options.block_style = 1;
 }
 
@@ -112,7 +112,7 @@ static void settings_dialog_response_cb (GtkDialog * dialog,
                                      GTK_BUTTONS_OK,
                                      "Invalid block size");
          g_signal_connect_swapped (m, "response", G_CALLBACK (gtk_widget_destroy), m);
-         gtk_window_set_title (GTK_WINDOW (m), "GTK Tetris");
+         gtk_window_set_title (GTK_WINDOW (m), "L:A_N:application_ID:game_over");
          gtk_widget_show (m);
          return;
       }
@@ -150,7 +150,7 @@ void options_show_dialog (void)
 
   settings_dialog = gtk_dialog_new ();
 
-  gtk_window_set_title(GTK_WINDOW(settings_dialog),"Settings");
+  gtk_window_set_title(GTK_WINDOW(settings_dialog),"L:A_N:application_ID:Settings");
   gtk_window_set_transient_for (GTK_WINDOW (settings_dialog), GTK_WINDOW (main_window));
   gtk_window_set_position (GTK_WINDOW (settings_dialog), GTK_WIN_POS_CENTER_ON_PARENT);
   gtk_window_set_modal (GTK_WINDOW (settings_dialog), TRUE);
@@ -276,4 +276,3 @@ void options_show_dialog (void)
 
   gtk_widget_show_all (settings_dialog);
 }
-

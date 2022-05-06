@@ -50,7 +50,7 @@ void show_highscore_dlg ()
    int i, temp;
 
    dialog = gtk_dialog_new ();
-   gtk_window_set_title (GTK_WINDOW (dialog), "Highscores");
+   gtk_window_set_title (GTK_WINDOW (dialog), "L:A_N:application_ID:Highscores");
    gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (main_window));
    gtk_window_set_position (GTK_WINDOW (dialog), GTK_WIN_POS_CENTER_ON_PARENT);
    gtk_window_set_modal (GTK_WINDOW (dialog), TRUE);

@@ -40,7 +40,7 @@ static const int block_color_rgb[2][8][3] =
 
 void set_background_color (cairo_t * cr, GdkRectangle * area)
 {
-   cairo_set_source_rgb (cr, 0.0, 0.0, 0.0);
+   cairo_set_source_rgb (cr, 1.0, 1.0, 1.0);
    cairo_rectangle (cr,
                     area->x, area->y,
                     area->width, area->height);
@@ -124,7 +124,7 @@ _cairo_gdk_draw_pixbuf (cairo_t *cr,
 }
 
 
-void load_tetris_blocks (const char ** source_blocks_pix)
+void load_tetris_blocks ()
 {
    float orig_block_width, orig_block_height;
    float src_x, src_y, dest_x, dest_y, width, height;
@@ -132,10 +132,10 @@ void load_tetris_blocks (const char ** source_blocks_pix)
    cairo_t * cr;
    cairo_format_t format;
 
-   blocks_pixbuf = gdk_pixbuf_new_from_xpm_data (source_blocks_pix);
+   // blocks_pixbuf = gdk_pixbuf_new_from_xpm_data (source_blocks_pix);
+   blocks_pixbuf = gdk_pixbuf_new_from_file ("blocks.bmp", NULL);
    orig_block_height = gdk_pixbuf_get_height (blocks_pixbuf);
    orig_block_width  = orig_block_height;
-
    if (gdk_pixbuf_get_n_channels (blocks_pixbuf) == 3) {
       format = CAIRO_FORMAT_RGB24;
    } else {
@@ -221,7 +221,7 @@ void set_block(int x,int y,int color,int next)
    //   https://stackoverflow.com/questions/15773965/how-to-fast-redrawing-an-image-buffer
    if (color == 0)
    { // black
-      cairo_set_source_rgb (cr, 0.0, 0.0, 0.0);
+      cairo_set_source_rgb (cr, 1.0, 1.0, 1.0);
       cairo_rectangle (cr, dest_x, dest_y, BLOCK_WIDTH, BLOCK_HEIGHT);
       cairo_fill (cr);
    } else {
@@ -251,7 +251,7 @@ void set_block(int x,int y,int color,int next)
       // not exactly a grid, just the block border
       // otherwise there is no block "border"
       draw_grid = TRUE;
-      cairo_set_source_rgb (cr, 0.0, 0.0, 0.0);
+      cairo_set_source_rgb (cr, 1.0, 1.0, 1.0);
    }
 
    if (draw_grid == TRUE)

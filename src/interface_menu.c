@@ -233,14 +233,14 @@ static void create_menu_bar (GtkBox * box, GtkWindow * window)
    menuitem_game_pause = gtk_check_menu_item_new_with_mnemonic ("Pause");
    gtk_menu_shell_append (GTK_MENU_SHELL (menu_game), menuitem_game_pause);
 
-   separator_menuitem = gtk_menu_item_new ();
-   gtk_menu_shell_append (GTK_MENU_SHELL (menu_game), separator_menuitem);
+   // separator_menuitem = gtk_menu_item_new ();
+   // gtk_menu_shell_append (GTK_MENU_SHELL (menu_game), separator_menuitem);
 
    menuitem_game_settings = gtk_menu_item_new_with_mnemonic ("Settings...");
    gtk_menu_shell_append (GTK_MENU_SHELL (menu_game), menuitem_game_settings);
 
-   separator_menuitem = gtk_menu_item_new ();
-   gtk_menu_shell_append (GTK_MENU_SHELL (menu_game), separator_menuitem);
+   // separator_menuitem = gtk_menu_item_new ();
+   // gtk_menu_shell_append (GTK_MENU_SHELL (menu_game), separator_menuitem);
 
    menuitem_game_quit = gtk_menu_item_new_with_mnemonic ("Quit");
    gtk_menu_shell_append (GTK_MENU_SHELL (menu_game), menuitem_game_quit);
@@ -254,15 +254,15 @@ static void create_menu_bar (GtkBox * box, GtkWindow * window)
    menuitem_help_help = gtk_menu_item_new_with_mnemonic ("_Help");
    gtk_menu_shell_append (GTK_MENU_SHELL (menu_help), menuitem_help_help);
 
-   separator_menuitem = gtk_menu_item_new ();
-   gtk_menu_shell_append (GTK_MENU_SHELL (menu_help), separator_menuitem);
+   // separator_menuitem = gtk_menu_item_new ();
+   // gtk_menu_shell_append (GTK_MENU_SHELL (menu_help), separator_menuitem);
 
    menuitem_help_scores = gtk_menu_item_new_with_mnemonic ("_Top scores");
    gtk_menu_shell_append (GTK_MENU_SHELL (menu_help), menuitem_help_scores);
 
-   separator_menuitem = gtk_menu_item_new ();
-   gtk_menu_shell_append (GTK_MENU_SHELL (menu_help), separator_menuitem);
-  
+   // separator_menuitem = gtk_menu_item_new ();
+   // gtk_menu_shell_append (GTK_MENU_SHELL (menu_help), separator_menuitem);
+
    menuitem_help_about = gtk_menu_item_new_with_mnemonic ("_About");
    gtk_menu_shell_append (GTK_MENU_SHELL (menu_help), menuitem_help_about);
 
@@ -287,21 +287,22 @@ static void create_menu_bar (GtkBox * box, GtkWindow * window)
                      G_CALLBACK (on_menuitem_scores_activate_cb), NULL);
 
    // accels
-   accel_group = gtk_accel_group_new ();
-   gtk_window_add_accel_group (GTK_WINDOW (window), accel_group);
-
-   gtk_widget_add_accelerator (menuitem_game_start, "activate", accel_group,
-                               GDK_KEY_G, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-   gtk_widget_add_accelerator (menuitem_game_stop, "activate", accel_group,
-                               GDK_KEY_O, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-   gtk_widget_add_accelerator (menuitem_game_pause, "activate", accel_group,
-                               GDK_KEY_P, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-   gtk_widget_add_accelerator (menuitem_game_settings, "activate",  accel_group,
-                               GDK_KEY_S, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-   gtk_widget_add_accelerator (menuitem_game_quit, "activate", accel_group,
-                               GDK_KEY_Q, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-   gtk_widget_add_accelerator (menuitem_help_help, "activate",  accel_group,
-                               GDK_KEY_F1, (GdkModifierType) 0, GTK_ACCEL_VISIBLE);
+   // accel_group = gtk_accel_group_new ();
+   // gtk_window_add_accel_group (GTK_WINDOW (window), accel_group);
+   //
+   // gtk_widget_add_accelerator (menuitem_game_start, "activate", accel_group,
+   //                             GDK_KEY_G, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+   // gtk_widget_add_accelerator (menuitem_game_stop, "activate", accel_group,
+   //                             GDK_KEY_O, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+   // gtk_widget_add_accelerator (menuitem_game_pause, "activate", accel_group,
+   //                             GDK_KEY_P, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+   // gtk_widget_add_accelerator (menuitem_game_settings, "activate",  accel_group,
+   //                             GDK_KEY_S, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+   // gtk_widget_add_accelerator (menuitem_game_quit, "activate", accel_group,
+   //                             GDK_KEY_Q, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+   // gtk_widget_add_accelerator (menuitem_help_help, "activate",  accel_group,
+   //                             GDK_KEY_F1, (GdkModifierType) 0, GTK_ACCEL_VISIBLE);
+   
 
    menu_stop ();
 }

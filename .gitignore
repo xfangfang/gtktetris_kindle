@@ -25,3 +25,5 @@ autoconf-m4
 config.mk
 config.h
 config.sh
+lib/
+*.tar.gz

@@ -10,13 +10,17 @@
 #include <time.h>
 
 #include "tetris.h"
-#include "tetris.xpm" /* tetris_xpm */
+// #include "tetris.xpm" /* tetris_xpm */
 
 static void show_about (void);
 static void game_start_stop (void);
 static void menu_start (void);
 static void menu_stop (void);
 static void menu_set_pause (void);
+static void game_click_up(void);
+static void game_click_left(void);
+static void game_click_bottom(void);
+static void game_click_right(void);
 #if GTK_CHECK_VERSION (3, 10, 0)
 static void create_menu_bar (GtkApplicationWindow * window, GtkApplication * app);
 #else
@@ -24,13 +28,14 @@ static void create_menu_bar (GtkBox * box, GtkWindow * window);
 #endif
 #include "interface_menu.c"
 
-#include "blocks.xpm"
+// #include "blocks.xpm"
 int BLOCK_WIDTH;
 int BLOCK_HEIGHT;
 
 int game_play;
 char *pause_str[2]={"Pause\0","Resume\0"};
 char *start_stop_str [2] = { "Start\0", "Stop\0"};
+char *direction_str [4]={"Up\0", "Left\0", "Down\0", "Right\0"};
 GtkWidget * main_window;
 
 GtkWidget * score_label;
@@ -42,6 +47,11 @@ GtkWidget *Start_stop_button_label;
 GtkWidget *Pause_button;
 GtkWidget *Pause_button_label;
 GtkWidget *about_window;
+GtkWidget *Up_button;
+GtkWidget *Left_button;
+GtkWidget *Bottom_button;
+GtkWidget *Right_button;
+
 gint timer;
 
 int level_speeds[NUM_LEVELS] = {
@@ -70,6 +80,35 @@ void update_game_values()
    set_label_with_color (lines_label, "green", dummy);
    snprintf (dummy, sizeof(dummy), "%ld", get_hiscore ());
    set_label_with_color (hiscore_label, "black", dummy);
+}
+
+void game_click_up (void)
+{
+  if(game_over || game_pause) return;
+  move_block(0,0,-1);
+}
+
+void game_click_left (void)
+{
+  if(game_over || game_pause) return;
+  move_block(-1,0,0);
+}
+
+void game_click_bottom (void)
+{
+  if(game_over || game_pause) return;
+  int dropbonus = 0;
+  while(move_down()) {
+     dropbonus++;
+  }
+  current_score += dropbonus*(current_level+1);
+  update_game_values();
+}
+
+void game_click_right (void)
+{
+  if(game_over || game_pause) return;
+  move_block(1,0,0);
 }
 
 gint keyboard_event_handler (GtkWidget *widget, GdkEventKey *event,
@@ -205,10 +244,18 @@ void game_set_pause (void)
    }
    if (game_pause) {
       gtk_label_set_text (GTK_LABEL(Pause_button_label),pause_str[1]);
+      gtk_widget_set_sensitive (Up_button, FALSE);
+      gtk_widget_set_sensitive (Left_button, FALSE);
+      gtk_widget_set_sensitive (Bottom_button, FALSE);
+      gtk_widget_set_sensitive (Right_button, FALSE);
    } else {
       timer = g_timeout_add (level_speeds[current_level],
                              (GSourceFunc)game_loop, NULL);
       gtk_label_set_text (GTK_LABEL (Pause_button_label), pause_str[0]);
+      gtk_widget_set_sensitive (Up_button, TRUE);
+      gtk_widget_set_sensitive (Left_button, TRUE);
+      gtk_widget_set_sensitive (Bottom_button, TRUE);
+      gtk_widget_set_sensitive (Right_button, TRUE);
    }
 }
 
@@ -216,7 +263,7 @@ void game_over_init()
 {
    int high_dummy;
    char hscr[30];
-   if(current_score && (high_dummy = addto_highscore((char *)getenv("USER"),current_score,current_level,current_lines)))
+   if(current_score && (high_dummy = addto_highscore(DEFAULT_USER_NAME,current_score,current_level,current_lines)))
    {
       write_highscore();
    }
@@ -237,6 +284,11 @@ void game_over_init()
    gtk_label_set_text (GTK_LABEL(Pause_button_label),pause_str[0]);
    gtk_widget_set_sensitive (Pause_button,FALSE);
 
+   gtk_widget_set_sensitive (Up_button, FALSE);
+   gtk_widget_set_sensitive (Left_button, FALSE);
+   gtk_widget_set_sensitive (Bottom_button, FALSE);
+   gtk_widget_set_sensitive (Right_button, FALSE);
+
    if (timer) {
       g_source_remove (timer);
       timer = 0;
@@ -253,6 +305,12 @@ static void game_start_stop (void)
       gtk_label_set_text (GTK_LABEL(Start_stop_button_label),start_stop_str[1]);
       gtk_widget_set_sensitive(Pause_button,TRUE);
       gtk_widget_grab_default(Pause_button);
+
+      gtk_widget_set_sensitive(Up_button,TRUE);
+      gtk_widget_set_sensitive(Left_button,TRUE);
+      gtk_widget_set_sensitive(Bottom_button,TRUE);
+      gtk_widget_set_sensitive(Right_button,TRUE);
+
       game_init();
       make_noise(options.noise_level,options.noise_height);
       from_virtual();
@@ -273,21 +331,25 @@ static void show_about (void)
        "1999-2000 Mattias Wadman",
        "2002-2006 Iavor Veltchev",
        "2020-2021 wdlkmpx (github)",
+       "2022 xfangfang (port to kindle)",
        NULL
    };
-   logo = gdk_pixbuf_new_from_xpm_data (tetris_xpm);
+   // logo = gdk_pixbuf_new_from_xpm_data (tetris_xpm);
+   logo = gdk_pixbuf_new_from_file("tetris.bmp", NULL);
 
+   //hide because this will cause error on kindle
    w = g_object_new (GTK_TYPE_ABOUT_DIALOG,
                      "version",      VERSION,
                      "program-name", "GTK Tetris",
-                     "copyright",    "Copyright (C) 1999-2021",
-                     "comments",     "Just another GTK Tetris",
-                     "license",      "MIT - Permission is hereby granted, free of charge, \nto any person obtaining a copy of this software \nand associated documentation files (the \"Software\"), \nto deal in the Software without restriction, \nincluding without limitation the rights to use, \ncopy, modify, merge, publish, distribute, sublicense, \nand/or sell copies of the Software.... \n\nsee LICENSE file",
-                     "website",      "https://github.com/wader/gtktetris",
-                     "authors",      authors,
+                     "copyright",    "Copyright (C) 1999-2022",
+                     "comments",     "Just another GTK Tetris\n\nAuthors:\n1999-2000 Mattias Wadman  \n2002-2006 Iavor Veltchev        \n2020-2021 wdlkmpx (github)   \n2022 xfangfang (port to kindle)\n\nwebsite:\nhttps://github.com/wader/gtktetris\n\nlicense: MIT",
+                     // "license",      "MIT - Permission is hereby granted, free of charge, \nto any person obtaining a copy of this software \nand associated documentation files (the \"Software\"), \nto deal in the Software without restriction, \nincluding without limitation the rights to use, \ncopy, modify, merge, publish, distribute, sublicense, \nand/or sell copies of the Software.... \n\nsee LICENSE file",
+                     // "website",      "https://github.com/wader/gtktetris",
+                     // "authors",      authors,
                      "logo",         logo,
                      NULL);
    gtk_container_set_border_width (GTK_CONTAINER (w), 2);
+   gtk_window_set_title (GTK_WINDOW (w), "L:A_N:application_ID:About");
    gtk_window_set_transient_for (GTK_WINDOW (w), GTK_WINDOW (main_window));
    gtk_window_set_modal (GTK_WINDOW (w), TRUE);
    gtk_window_set_position (GTK_WINDOW (w), GTK_WIN_POS_CENTER_ON_PARENT);
@@ -321,7 +383,7 @@ void update_block_size (int startup)
    {
       // allocate blocks
       free_tetris_blocks ();
-      load_tetris_blocks (blocks_xpm);
+      load_tetris_blocks ();
 
       // set game_area and next_block_area size
       gtk_widget_set_size_request (GTK_WIDGET (game_area),
@@ -364,27 +426,30 @@ void create_main_window (void)
    current_x = current_y = 0;
    current_block = current_frame = 0;
    current_score = current_lines = 0;
-   current_level = options.start_level; 
+   current_level = options.start_level;
    next_block = next_frame = 0;
    // seed random generator
    srandom(time(NULL));
 
    // window
    main_window = gtk_application_window_new (gtktetris_app);
-   gtk_window_set_resizable (GTK_WINDOW (main_window), FALSE);
-   gtk_window_set_title(GTK_WINDOW(main_window),"GTK Tetris");
+   // gtk_widget_set_size_request(main_window, 600, 800);
+   // gtk_window_set_resizable (GTK_WINDOW (main_window), FALSE);
+   gtk_window_set_title(GTK_WINDOW(main_window),"L:A_N:application_ID:gtktetris");
    g_signal_connect (G_OBJECT (main_window), "key_press_event",
                      G_CALLBACK (keyboard_event_handler), NULL);
    g_signal_connect (G_OBJECT (main_window), "destroy",
                      G_CALLBACK (main_window_destroy_cb), NULL);
 
-   GdkPixbuf * icon = gdk_pixbuf_new_from_xpm_data (tetris_xpm);
+   // GdkPixbuf * icon = gdk_pixbuf_new_from_xpm_data (tetris_xpm);
+
+   GdkPixbuf * icon = gdk_pixbuf_new_from_file("tetris.bmp", NULL);
    gtk_window_set_icon (GTK_WINDOW(main_window), icon);
    g_object_unref (icon);
 
    // vertical box
-   v_box = gtk_box_new (GTK_ORIENTATION_VERTICAL,0);
-   gtk_container_add(GTK_CONTAINER(main_window),v_box);
+   v_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
+   gtk_container_add(GTK_CONTAINER(main_window), v_box);
 
    // menu bar
 #if GTK_CHECK_VERSION (3, 10, 0)
@@ -395,33 +460,33 @@ void create_main_window (void)
 
    // horizontal box
    h_box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
-   gtk_box_pack_start (GTK_BOX (v_box), h_box, FALSE, FALSE, 2);
-  
+   gtk_box_pack_start (GTK_BOX (v_box), h_box, TRUE, FALSE, 2);
+
    // game_area
    game_area = gtk_drawing_area_new();
    g_signal_connect (game_area, GTKCOMPAT_DRAW_SIGNAL,
                      G_CALLBACK (game_area_draw_cb), NULL);
    gtk_widget_set_events (game_area, GDK_EXPOSURE_MASK);
-   gtk_box_pack_start (GTK_BOX (h_box), game_area, FALSE, FALSE, 2);
-  
+   gtk_box_pack_start (GTK_BOX (h_box), game_area, TRUE, FALSE, 2);
+
    // right_side
    right_side = gtk_box_new (GTK_ORIENTATION_VERTICAL,0);
-   gtk_box_pack_start (GTK_BOX(h_box), right_side, FALSE, FALSE, 3);
-  
+   gtk_box_pack_start (GTK_BOX(h_box), right_side, TRUE, FALSE, 3);
+
    // next_block_area
    next_block_area = gtk_drawing_area_new();
    g_signal_connect (next_block_area, GTKCOMPAT_DRAW_SIGNAL,
                      G_CALLBACK (next_block_area_draw_cb), NULL);
    gtk_widget_set_events(next_block_area, GDK_EXPOSURE_MASK);
    gtk_box_pack_start (GTK_BOX (right_side), next_block_area, FALSE, FALSE, 0);
-  
+
    // the score, level and lines labels
    frame_labels = gtk_frame_new (NULL);
    gtk_box_pack_start (GTK_BOX (right_side), frame_labels, FALSE, FALSE, 5);
    vbox_labels = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
    gtk_container_add (GTK_CONTAINER (frame_labels), vbox_labels);
    gtk_container_set_border_width (GTK_CONTAINER (vbox_labels), 5); /* padding inside frame */
-  
+
    label = gtk_label_new ("Score:");
    gtk_box_pack_start (GTK_BOX (vbox_labels), label, FALSE, FALSE, 0);
    score_label = gtk_label_new ("0");
@@ -467,10 +532,51 @@ void create_main_window (void)
    Pause_button_label = gtk_bin_get_child (GTK_BIN (Pause_button));
    g_signal_connect (Pause_button, "clicked",
                      G_CALLBACK (menu_set_pause), NULL);
-   gtk_box_pack_start(GTK_BOX(right_side),Pause_button,FALSE,FALSE,3);
+   gtk_box_pack_start(GTK_BOX(right_side),Pause_button,FALSE,FALSE,10);
    gtk_widget_set_can_default (Pause_button, TRUE);
    gtk_widget_set_sensitive (Pause_button,FALSE);
-  
+
+   GtkWidget *v_box_gamepad;
+   v_box_gamepad = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
+   gtk_box_pack_start (GTK_BOX (right_side), v_box_gamepad, TRUE, FALSE, 10);
+
+   //Up
+   Up_button = gtk_button_new_with_label (direction_str[0]);
+   g_signal_connect (Up_button, "clicked",
+                     G_CALLBACK (game_click_up), NULL);
+   gtk_box_pack_start(GTK_BOX(v_box_gamepad),Up_button,FALSE,FALSE,3);
+   gtk_widget_set_can_default (Up_button, TRUE);
+   gtk_widget_set_sensitive (Up_button,FALSE);
+
+   //Left and right box
+   GtkWidget *h_box_left_right;
+   h_box_left_right = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+   gtk_box_pack_start (GTK_BOX (v_box_gamepad), h_box_left_right, FALSE, FALSE, 3);
+
+   //Left
+   Left_button = gtk_button_new_with_label (direction_str[1]);
+   g_signal_connect (Left_button, "clicked",
+                     G_CALLBACK (game_click_left), NULL);
+   gtk_box_pack_start(GTK_BOX(h_box_left_right),Left_button,TRUE,FALSE,3);
+   gtk_widget_set_can_default (Left_button, TRUE);
+   gtk_widget_set_sensitive (Left_button,FALSE);
+
+   //Right
+   Right_button = gtk_button_new_with_label (direction_str[3]);
+   g_signal_connect (Right_button, "clicked",
+                     G_CALLBACK (game_click_right), NULL);
+   gtk_box_pack_start(GTK_BOX(h_box_left_right),Right_button,TRUE,FALSE,3);
+   gtk_widget_set_can_default (Right_button, TRUE);
+   gtk_widget_set_sensitive (Right_button,FALSE);
+
+   //Bottom
+   Bottom_button = gtk_button_new_with_label (direction_str[2]);
+   g_signal_connect (Bottom_button, "clicked",
+                     G_CALLBACK (game_click_bottom), NULL);
+   gtk_box_pack_start(GTK_BOX(v_box_gamepad),Bottom_button,FALSE,FALSE,3);
+   gtk_widget_set_can_default (Bottom_button, TRUE);
+   gtk_widget_set_sensitive (Bottom_button,FALSE);
+
    read_highscore ();
    update_game_values ();
 

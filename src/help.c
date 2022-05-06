@@ -8,7 +8,7 @@ void show_help (void)
     int i;
 
     dialog = gtk_dialog_new ();
-    gtk_window_set_title (GTK_WINDOW (dialog), "Help");
+    gtk_window_set_title (GTK_WINDOW (dialog), "L:A_N:application_ID:Help");
     gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (main_window));
     gtk_window_set_position (GTK_WINDOW (dialog), GTK_WIN_POS_CENTER_ON_PARENT);
     gtk_window_set_modal (GTK_WINDOW (dialog), TRUE);
@@ -63,12 +63,10 @@ void show_help (void)
 
     static const char * helpx[] =
     {
-        "Right and 'd'", "move right",
-        "Left and 'a'",  "move left",
-        "'s'",           "move down",
-        "Up and 'w'",    "rotate ccw",
-        "'x'",           "rotate cw",
-        "Space and down", "drop block",
+        "Right", "move right",
+        "Left",  "move left",
+        "Up",    "rotate",
+        "Down", "drop block",
         "Score: score*level", "",
         "Single", "40",
         "Double", "100",
